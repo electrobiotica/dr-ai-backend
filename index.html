@@ -207,7 +207,7 @@ body.dark-mode .container {
         const fecha = new Date().toISOString();
         const historial = JSON.parse(localStorage.getItem('historial')) || [];
         const nuevo = { nombre, informe: contenido, fecha };
-      fetch('https://dr-ai-backend.onrender.com/api/guardar', {
+      fetch('https://dr-ai-ar-c5y3.onrender.com/api/guardar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(nuevo)
@@ -286,15 +286,7 @@ function guardarSesion() {
     return;
   }
   const historial = JSON.parse(localStorage.getItem('historial')) || [];
-  fetch('https://dr-ai-backend.onrender.com/api/historial')
-    .then(res => res.json())
-    .then(historial => {
-      localStorage.setItem(`historial_${userId}`, JSON.stringify(historial));
-      localStorage.setItem('historial', JSON.stringify(historial));
-      document.getElementById('estadoLogin').innerText = 'Historial cargado como ' + userId;
-      document.getElementById('usuarioActivo').innerText = `(${userId})`;
-      mostrarHistorial();
-    });, JSON.stringify(historial));
+  localStorage.setItem(`historial_${userId}`, JSON.stringify(historial));
   document.getElementById('estadoLogin').innerText = 'Historial guardado como ' + userId;
   document.getElementById('usuarioActivo').innerText = `(${userId})`;
 }
