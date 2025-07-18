@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es" class="">
 <head>
+  <script src="https://js.puter.com/v2/"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DR.AI</title>
@@ -207,7 +208,7 @@ body.dark-mode .container {
         const fecha = new Date().toISOString();
         const historial = JSON.parse(localStorage.getItem('historial')) || [];
         const nuevo = { nombre, informe: contenido, fecha };
-      fetch('https://dr-ai-ar-c5y3.onrender.com/api/guardar', {
+      fetch('https://dr-ai-backend.onrender.com/api/guardar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(nuevo)
