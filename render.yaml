@@ -1,0 +1,8 @@
+
+services:
+  - type: web
+    name: dr-ai-backend
+    env: python
+    plan: free
+    buildCommand: ""
+    startCommand: python backend_flask_medical_gpt.py
