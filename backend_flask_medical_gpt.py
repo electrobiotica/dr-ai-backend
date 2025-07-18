@@ -1,5 +1,4 @@
-
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import json
 import os
@@ -19,6 +18,10 @@ def guardar_historial(historial):
     with open(HISTORIAL_FILE, "w", encoding="utf-8") as f:
         json.dump(historial, f, indent=2, ensure_ascii=False)
 
+@app.route("/")
+def home():
+    return "✅ DR.AI Backend funcionando correctamente. Usa /api/historial, /api/guardar o /index.html"
+
 @app.route("/api/historial", methods=["GET"])
 def obtener_historial():
     return jsonify(cargar_historial())
@@ -30,6 +33,10 @@ def guardar():
     historial.append(datos)
     guardar_historial(historial)
     return jsonify({"status": "ok", "mensaje": "Historial guardado"})
+
+@app.route("/index.html")
+def servir_index():
+    return send_from_directory('.', 'index.html')
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
