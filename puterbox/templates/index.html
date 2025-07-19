@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Box de Consulta AI</title>
+    <script src="https://js.puter.com/v2/"></script>
+</head>
+<body>
+    <h1>Consulta a la IA</h1>
+    <form method="POST">
+        <input type="text" name="pregunta" id="pregunta" placeholder="Escribí tu pregunta..." required>
+        <button type="submit">Enviar</button>
+    </form>
+
+    <button onclick="consultarIA()">Consultar IA</button>
+
+    <div id="respuesta"></div>
+
+    <script>
+        function consultarIA() {
+            const pregunta = document.getElementById("pregunta").value;
+            puter.ai.chat(pregunta, { model: "gpt-4.1" })
+                .then(response => {
+                    document.getElementById("respuesta").innerHTML = "<p><strong>Respuesta:</strong> " + response + "</p>";
+                });
+        }
+    </script>
+</body>
+</html>
