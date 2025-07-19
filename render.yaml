@@ -1,8 +1,13 @@
-
 services:
   - type: web
-    name: dr-ai-backend
+    name: dr-ai
     env: python
+    region: oregon
     plan: free
-    buildCommand: ""
-    startCommand: python backend_flask_medical_gpt.py
+    buildCommand: |
+      pip install -r requirements.txt
+    startCommand: |
+      gunicorn app:app
+    envVars:
+      - key: OPENROUTER_KEY
+        sync: false          # la cargas manualmente en Render
