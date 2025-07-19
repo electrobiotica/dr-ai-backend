@@ -4,139 +4,41 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DR.AI</title>
+  <!-- Markdown renderer -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
-    html {
-      background-color: #f0f0f0;
-      transition: background-color 0.3s;
-    }
-    html.dark-mode {
-      background-color: #1f2937;
-    }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: #111;
-      margin: 0;
-      padding: 0;
-      transition: background-color 0.3s, color 0.3s;
-    }
-    body.dark-mode {
-  background-color: #1f2937;
-  color: white;
-}
-
-body.dark-mode .container {
-  background-color: #1e1e2e;
-  box-shadow: 0 0 15px rgba(255,255,255,0.05);
-}
-    .container {
-  max-width: 900px;
-  margin: auto;
-  padding: 2rem;
-  background: white;
-  border-radius: 1rem;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-  transition: background-color 0.3s;
-}
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    header button {
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-    h1 {
-      margin-top: 0;
-    }
-    input, select, textarea {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 1rem;
-      background: white;
-      color: black;
-    }
-    body.dark-mode input,
-    body.dark-mode select,
-    body.dark-mode textarea {
-      background-color: #111827;
-      color: white;
-      border: 1px solid #888;
-    }
-    button {
-      padding: 10px 20px;
-      background: royalblue;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-right: 10px;
-      margin-top: 10px;
-    }
-    #reporte {
-      margin-top: 2rem;
-      padding: 1rem;
-      border: 1px solid #ccc;
-      background: white;
-      color: black;
-      border-radius: 6px;
-    }
-    body.dark-mode #reporte {
-      background: #111827;
-      color: white;
-    }
-    .acciones {
-      margin-top: 1rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    .historial-item {
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      padding: 10px;
-      margin-top: 10px;
-      background: #f9f9f9;
-    }
-    body.dark-mode .historial-item {
-      background: #2a2a2a;
-    }
-    .historial-item a {
-      text-decoration: none;
-      color: royalblue;
-      cursor: pointer;
-    }
-    .historial-item a:hover {
-      text-decoration: underline;
-    }
-    footer {
-      margin-top: 4rem;
-      font-size: 0.9rem;
-      color: #777;
-      text-align: center;
-    }
-    body.dark-mode footer {
-      color: #ccc;
-    }
-    @media (max-width: 600px) {
-      .acciones {
-        flex-direction: column;
-      }
-      button {
-        width: 100%;
-      }
-    }
+    html { background-color:#f0f0f0; transition:background-color .3s; }
+    html.dark-mode { background-color:#1f2937; }
+    body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; color:#111; margin:0; padding:0; transition:background-color .3s,color .3s; }
+    body.dark-mode { background-color:#1f2937; color:#fff; }
+    body.dark-mode .container { background-color:#1e1e2e; box-shadow:0 0 15px rgba(255,255,255,.05); }
+    .container { max-width:900px; margin:auto; padding:2rem; background:#fff; border-radius:1rem; box-shadow:0 8px 24px rgba(0,0,0,.1); transition:background-color .3s; }
+    header { display:flex; justify-content:space-between; align-items:center; }
+    header button { background:none; border:none; font-size:1.5rem; cursor:pointer; }
+    h1 { margin-top:0; }
+    input,select,textarea { width:100%; padding:10px; margin:10px 0; border:1px solid #ccc; border-radius:6px; font-size:1rem; background:#fff; color:#000; }
+    body.dark-mode input, body.dark-mode select, body.dark-mode textarea { background-color:#111827; color:#fff; border:1px solid #888; }
+    button { padding:10px 20px; background:royalblue; color:#fff; border:none; border-radius:5px; cursor:pointer; margin-right:10px; margin-top:10px; }
+    #reporte { margin-top:2rem; padding:1rem; border:1px solid #ccc; background:#fff; color:#000; border-radius:6px; }
+    body.dark-mode #reporte { background:#111827; color:#fff; }
+    .acciones { margin-top:1rem; display:flex; flex-wrap:wrap; gap:10px; }
+    .historial-item { border:1px solid #ccc; border-radius:6px; padding:10px; margin-top:10px; background:#f9f9f9; }
+    body.dark-mode .historial-item { background:#2a2a2a; }
+    .historial-item a { text-decoration:none; color:royalblue; cursor:pointer; }
+    .historial-item a:hover { text-decoration:underline; }
+    footer { margin-top:4rem; font-size:.9rem; color:#777; text-align:center; }
+    body.dark-mode footer { color:#ccc; }
+    @media(max-width:600px){ .acciones{flex-direction:column;} button{width:100%;} }
+    /* Login overlay */
+    #loginPanel{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.4);z-index:9999;display:none;align-items:center;justify-content:center;}
+    #loginBox{background:#fff;border-radius:1rem;padding:2rem;max-width:400px;width:90%;box-shadow:0 5px 20px rgba(0,0,0,.2);color:#000;}
+    body.dark-mode #loginBox{background:#1e1e2e;color:#fff;}
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>🩺 DR.AI <span id="usuarioActivo" style="font-size: 0.6em; margin-left: 10px; color: #888;"></span></h1>
+      <h1>🩺 DR.AI <span id="usuarioActivo" style="font-size:.6em;margin-left:10px;color:#888;"></span></h1>
       <div>
         <button onclick="toggleModo()" title="Cambiar modo">🌗</button>
         <button onclick="toggleLogin()" title="Iniciar sesión" id="loginBtn" style="color:#111;">👤 Iniciar sesión</button>
@@ -159,7 +61,15 @@ body.dark-mode .container {
     <label>Síntomas:</label>
     <textarea id="sintomas" rows="4"></textarea>
 
-    <button onclick="consultar()">Consultar</button>
+    <label>Hábitos relevantes (opcional):</label>
+    <textarea id="habitos" rows="2"></textarea>
+
+    <label>Antecedentes personales y familiares (opcional):</label>
+    <textarea id="antecedentes" rows="2"></textarea>
+
+    <button onclick="consultarIA()">Consultar con IA</button>
+
+    <div id="reporte"></div>
 
     <div class="acciones">
       <button onclick="guardarInforme()">💾 Guardar</button>
@@ -167,156 +77,195 @@ body.dark-mode .container {
       <button onclick="mostrarHistorial()">📚 Ver historial</button>
     </div>
 
-    <div id="reporte"></div>
     <div id="historial"></div>
 
     <footer>
       <p>⚠️ Esta aplicación no reemplaza la consulta médica profesional. Consulte con un médico ante cualquier duda o emergencia.</p>
     </footer>
+  </div>
+
+  <!-- LOGIN PANEL -->
+  <div id="loginPanel">
+    <div id="loginBox">
+      <h3>👤 Iniciar sesión</h3>
+      <label>Email o alias:</label>
+      <input type="text" id="userId">
+      <div style="margin-top:10px;">
+        <button onclick="guardarSesion()">💾 Guardar historial</button>
+        <button onclick="cargarSesion(document.getElementById('userId').value)">📥 Cargar historial</button>
+        <button onclick="cerrarSesion()">❌ Cerrar sesión</button>
+      </div>
+      <p id="estadoLogin" style="margin-top:.5rem;font-style:italic;"></p>
     </div>
-</div>
+  </div>
+
 <script>
-    function toggleModo() {
-  const loginBtn = document.getElementById('loginBtn');
-      const dark = document.body.classList.toggle('dark-mode');
-      document.documentElement.classList.toggle('dark-mode', dark);
-        loginBtn.style.color = dark ? 'white' : '#111';
-  localStorage.setItem('modoOscuro', dark);
+  /* ------------------- Constantes de IA ------------------- */
+  const SYSTEM_PROMPT = `Eres DR.AI, un asistente médico en español que:\n• Genera análisis diferenciales rigurosos basados en evidencia.\n• Nunca diagnostica de forma definitiva ni prescribe medicación; sólo orienta.\n• Utiliza lenguaje claro para público general (<B2).\n• Devuelve SIEMPRE la misma estructura en Markdown con encabezados emoji.\n\nFormato estricto de salida:\n🧠 **Hipótesis diagnósticas preliminares (5)**\n- #1 {enfermedad}\n- #2 {enfermedad}\n- #3 {enfermedad}\n- #4 {enfermedad}\n- #5 {enfermedad}\n\n🔬 **Correlaciones con evidencia científica**  \nExplica por qué cada hipótesis se relaciona con los síntomas. Incluye citas abreviadas tipo *(Smith 2023)*.\n\n📋 **Estudios complementarios sugeridos**  \nLista exámenes (max 5) + breve justificación.\n\n💊 **Recomendaciones y orientación terapéutica**  \nConsejos de estilo de vida y “consulte a un especialista”.\n\n⚠️ Incluye pie de página: “*Esta información no sustituye la consulta médica profesional.*”`;
+
+  function buildUserPrompt(datos) {
+    return `Paciente: ${datos.nombre}\nEdad: ${datos.edad} años\nSexo: ${datos.sexo}\nSíntomas reportados: ${datos.sintomas}\nHábitos relevantes: ${datos.habitos}\nAntecedentes personales y familiares: ${datos.antecedentes}`;
+  }
+
+  /* ------------------- Tema claro / oscuro ------------------- */
+  function toggleModo() {
+    const loginBtn = document.getElementById('loginBtn');
+    const dark = document.body.classList.toggle('dark-mode');
+    document.documentElement.classList.toggle('dark-mode', dark);
+    loginBtn.style.color = dark ? 'white' : '#111';
+    localStorage.setItem('modoOscuro', dark);
+  }
+
+  window.onload = function () {
+    const isDark = localStorage.getItem('modoOscuro') === 'true';
+    document.body.classList.toggle('dark-mode', isDark);
+    document.documentElement.classList.toggle('dark-mode', isDark);
+    document.getElementById('loginBtn').style.color = isDark ? 'white' : '#111';
+  }
+
+  /* ------------------- Consultas ------------------- */
+  async function consultar() {
+    try {
+      const response = await fetch('/api/historial');
+      const historial = await response.json();
+      document.getElementById("reporte").innerHTML = `<pre>${JSON.stringify(historial, null, 2)}</pre>`;
+    } catch (err) {
+      document.getElementById("reporte").innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+    }
+  }
+
+  async function consultarIA() {
+    // Obtener datos del formulario
+    const datosPaciente = {
+      nombre: document.getElementById("nombre").value || "Paciente",
+      edad: document.getElementById("edad").value || "edad desconocida",
+      sexo: document.getElementById("sexo").value || "sin especificar",
+      sintomas: document.getElementById("sintomas").value.trim(),
+      habitos: document.getElementById("habitos").value.trim() || "No referidos",
+      antecedentes: document.getElementById("antecedentes").value.trim() || "No referidos"
+    };
+
+    if (!datosPaciente.sintomas) {
+      alert("Por favor ingrese los síntomas antes de consultar.");
+      return;
     }
 
-    window.onload = function () {
-  document.getElementById('loginPanel').style.display = 'none';
-  const isDark = localStorage.getItem('modoOscuro') === 'true';
-  const loginBox = document.getElementById('loginBox');
-  loginBox.style.background = isDark ? '#1e1e2e' : '#fff';
-  loginBox.style.color = isDark ? '#fff' : '#111';
-  document.getElementById('loginPanel').style.display = 'none';
-      const modoOscuroGuardado = localStorage.getItem('modoOscuro') === 'true';
-      if (modoOscuroGuardado) {
-    document.getElementById('loginBtn').style.color = 'white';
-  } else {
-    document.getElementById('loginBtn').style.color = '#111';
-        document.body.classList.add('dark-mode');
-        document.documentElement.classList.add('dark-mode');
-      }
-    }
-      async function guardarInforme() {
-      const contenido = document.getElementById('reporte').innerHTML;
-      const nombre = document.getElementById('nombre').value || 'Anónimo';
-      if (contenido) {
-        const fecha = new Date().toISOString();
-        const historial = JSON.parse(localStorage.getItem('historial')) || [];
-        const nuevo = { nombre, informe: contenido, fecha };
-      fetch('https://dr-ai-backend.onrender.com/api/guardar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(nuevo)
+    const userPrompt = buildUserPrompt(datosPaciente);
+
+    const payload = {
+      model: "openai/gpt-3.5-turbo",
+      temperature: 0.3,
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: userPrompt }
+      ]
+    };
+
+    document.getElementById("reporte").innerHTML = "<p>🔄 Consultando IA médica…</p>";
+
+    try {
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer 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",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
       });
+      const data = await response.json();
+      const contenido = data.choices?.[0]?.message?.content || "Sin respuesta.";
+      // Renderizar Markdown a HTML
+      const html = marked.parse(contenido);
+      document.getElementById("reporte").innerHTML = html;
+    } catch (err) {
+      document.getElementById("reporte").innerHTML = `<p style='color:red;'>Error al consultar IA: ${err.message}</p>`;
+    }
+  }
+
+  /* ------------------- Historial local ------------------- */
+  function guardarInforme() {
+    const contenido = document.getElementById('reporte').innerHTML;
+    const nombre = document.getElementById('nombre').value || 'Anónimo';
+    if (contenido) {
+      const fecha = new Date().toISOString();
+      const historial = JSON.parse(localStorage.getItem('historial')) || [];
+      const nuevo = { nombre, informe: contenido, fecha };
       historial.push(nuevo);
       localStorage.setItem('historial', JSON.stringify(historial));
-        alert('Informe guardado localmente.');
-      } else {
-        alert('No hay informe para guardar.');
-      }
+      alert('Informe guardado localmente.');
+    } else {
+      alert('No hay informe para guardar.');
     }
+  }
 
-    function mostrarHistorial() {
-      const historial = JSON.parse(localStorage.getItem('historial')) || [];
-      if (historial.length === 0) {
-        document.getElementById('historial').innerHTML = '<p>No hay historial disponible.</p>';
-        return;
-      }
-
-      const historialHTML = historial.map((item, index) => {
-        const fecha = new Date(item.fecha);
-        const fechaLocal = fecha.toLocaleDateString();
-        const horaLocal = fecha.toLocaleTimeString();
-        return `<div class="historial-item">
-          <strong>${item.nombre}</strong><br>
-          <small>${fechaLocal} ${horaLocal}</small><br>
-          <a href="#" onclick="mostrarInforme(${index})">🔎 Ver informe</a>
-        </div>`;
-      }).join('');
-
-      document.getElementById('historial').innerHTML = historialHTML;
+  function mostrarHistorial() {
+    const historial = JSON.parse(localStorage.getItem('historial')) || [];
+    if (historial.length === 0) {
+      document.getElementById('historial').innerHTML = '<p>No hay historial disponible.</p>';
+      return;
     }
+    const historialHTML = historial.map((item, index) => {
+      const fecha = new Date(item.fecha);
+      return `<div class="historial-item"><strong>${item.nombre}</strong><br><small>${fecha.toLocaleDateString()} ${fecha.toLocaleTimeString()}</small><br><a href="#" onclick="mostrarInforme(${index})">🔎 Ver informe</a></div>`;
+    }).join('');
+    document.getElementById('historial').innerHTML = historialHTML;
+  }
 
-    function mostrarInforme(index) {
-      const historial = JSON.parse(localStorage.getItem('historial')) || [];
-      if (historial[index]) {
-        const informe = historial[index].informe;
-        const reporte = document.getElementById('reporte');
-        reporte.innerHTML = informe;
-        const isDark = document.body.classList.contains('dark-mode');
-        reporte.classList.remove('modo-claro', 'modo-oscuro');
-        reporte.classList.add(isDark ? 'modo-oscuro' : 'modo-claro');
-        window.scrollTo({ top: reporte.offsetTop, behavior: 'smooth' });
-      }
+  function mostrarInforme(index) {
+    const historial = JSON.parse(localStorage.getItem('historial')) || [];
+    if (historial[index]) {
+      document.getElementById('reporte').innerHTML = historial[index].informe;
     }
-  </script>
+  }
 
-  <div id="loginPanel" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); z-index:9999; align-items:center; justify-content:center;">
-  <div id="loginBox" style="background:white; border-radius:1rem; padding:2rem; max-width:400px; width:90%; box-shadow:0 5px 20px rgba(0,0,0,0.2); color:#000;">
+  function exportarPDF() {
+    const contenido = document.getElementById('reporte').innerHTML;
+    const ventana = window.open('', '_blank');
+    ventana.document.write('<html><head><title>Informe Médico</title></head><body>');
+    ventana.document.write(contenido);
+    ventana.document.write('</body></html>');
+    ventana.document.close();
+    ventana.print();
+  }
 
-  <h3>👤 Iniciar sesión</h3>
-  <label>Email o alias:</label>
-  <input type="text" id="userId">
-  <div style="margin-top: 10px;">
-    <button onclick="guardarSesion()">💾 Guardar historial</button>
-    <button onclick="cargarSesion(document.getElementById('userId').value)">📥 Cargar historial</button>
-    <button onclick="cerrarSesion()">❌ Cerrar sesión</button>
-  </div>
-  <p id="estadoLogin" style="margin-top: 0.5rem; font-style: italic;"></p>
-</div>
-
-<script>
-function toggleLogin() {
-  const panel = document.getElementById('loginPanel');
-  panel.style.display = panel.style.display === 'flex' ? 'none' : 'flex';
-  const isDark = document.body.classList.contains('dark-mode');
-  const loginBox = document.getElementById('loginBox');
+  /* ------------------- LOGIN ------------------- */
+  function toggleLogin() {
+    const panel = document.getElementById('loginPanel');
+    panel.style.display = panel.style.display === 'flex' ? 'none' : 'flex';
+    const isDark = document.body.classList.contains('dark-mode');
+    const loginBox = document.getElementById('loginBox');
     loginBox.style.background = isDark ? '#1e1e2e' : '#fff';
-  loginBox.style.color = isDark ? '#fff' : '#111';
-}
-
-function guardarSesion() {
-  const userId = document.getElementById('userId').value;
-  if (!userId) {
-    alert('Ingrese un identificador.');
-    return;
+    loginBox.style.color = isDark ? '#fff' : '#111';
   }
-  const historial = JSON.parse(localStorage.getItem('historial')) || [];
-  fetch('https://dr-ai-backend.onrender.com/api/historial')
-    .then(res => res.json())
-    .then(historial => {
-      localStorage.setItem(`historial_${userId}`, JSON.stringify(historial));
-      localStorage.setItem('historial', JSON.stringify(historial));
-      document.getElementById('estadoLogin').innerText = 'Historial cargado como ' + userId;
-      document.getElementById('usuarioActivo').innerText = `(${userId})`;
-      mostrarHistorial();
-    });, JSON.stringify(historial));
-  document.getElementById('estadoLogin').innerText = 'Historial guardado como ' + userId;
-  document.getElementById('usuarioActivo').innerText = `(${userId})`;
-}
 
-function cerrarSesion() {
-  document.getElementById('userId').value = '';
-  document.getElementById('estadoLogin').innerText = '';
-  document.getElementById('usuarioActivo').innerText = '';
-  document.getElementById('loginPanel').style.display = 'none';
-}
-
-function cargarSesion(userId) {
-  const datos = JSON.parse(localStorage.getItem(`historial_${userId}`));
-  if (datos) {
-    localStorage.setItem('historial', JSON.stringify(datos));
-    mostrarHistorial();
-    document.getElementById('estadoLogin').innerText = 'Historial cargado.';
+  function guardarSesion() {
+    const userId = document.getElementById('userId').value.trim();
+    if (!userId) { alert('Ingrese un identificador.'); return; }
+    const historial = JSON.parse(localStorage.getItem('historial')) || [];
+    localStorage.setItem(`historial_${userId}`, JSON.stringify(historial));
+    document.getElementById('estadoLogin').innerText = 'Historial guardado como ' + userId;
     document.getElementById('usuarioActivo').innerText = `(${userId})`;
-  } else {
-    document.getElementById('estadoLogin').innerText = 'No se encontró historial con ese ID.';
   }
-}
+
+  function cargarSesion(userId) {
+    if (!userId) { alert('Ingrese un identificador para cargar.'); return; }
+    const datos = JSON.parse(localStorage.getItem(`historial_${userId}`));
+    if (datos) {
+      localStorage.setItem('historial', JSON.stringify(datos));
+      mostrarHistorial();
+      document.getElementById('estadoLogin').innerText = 'Historial cargado.';
+      document.getElementById('usuarioActivo').innerText = `(${userId})`;
+    } else {
+      document.getElementById('estadoLogin').innerText = 'No se encontró historial con ese ID.';
+    }
+  }
+
+  function cerrarSesion() {
+    document.getElementById('userId').value = '';
+    document.getElementById('estadoLogin').innerText = '';
+    document.getElementById('usuarioActivo').innerText = '';
+    document.getElementById('loginPanel').style.display = 'none';
+  }
 </script>
 </body>
 </html>
