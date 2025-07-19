@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DR.AI</title>
+  <!-- Markdown renderer -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    html        { background:#f0f0f0; transition:background .3s; }
+    html.dark-mode { background:#1f2937; }
+
+    body        { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+                  color:#111; margin:0; transition:background .3s,color .3s; }
+    body.dark-mode { background:#1f2937; color:#fff; }
+
+    .container  { max-width:900px; margin:auto; padding:2rem; background:#fff;
+                  border-radius:1rem; box-shadow:0 8px 24px rgba(0,0,0,.1);
+                  transition:background .3s; }
+    body.dark-mode .container {
+                  background:#1e1e2e; box-shadow:0 0 15px rgba(255,255,255,.05); }
+
+    header      { display:flex; justify-content:space-between; align-items:center; }
+    header button { background:none; border:none; font-size:1.5rem; cursor:pointer; }
+
+    input,select,textarea {
+      width:100%; padding:10px; margin:10px 0; border:1px solid #ccc;
+      border-radius:6px; font-size:1rem;
+    }
+    body.dark-mode input,
+    body.dark-mode select,
+    body.dark-mode textarea {
+      background:#111827; color:#fff; border:1px solid #888;
+    }
+
+    button      { padding:10px 20px; background:royalblue; color:#fff;
+                  border:none; border-radius:5px; cursor:pointer;
+                  margin-right:10px; margin-top:10px; }
+
+    #reporte    { margin-top:2rem; padding:1rem; border:1px solid #ccc;
+                  border-radius:6px; }
+    body.dark-mode #reporte { background:#111827; color:#fff; }
+
+    .acciones   { margin-top:1rem; display:flex; flex-wrap:wrap; gap:10px; }
+
+    .historial-item {
+      border:1px solid #ccc; border-radius:6px; padding:10px; margin-top:10px;
+      background:#f9f9f9;
+    }
+    body.dark-mode .historial-item { background:#2a2a2a; }
+    .historial-item a { color:royalblue; text-decoration:none; }
+
+    footer      { margin-top:4rem; font-size:.9rem; color:#777; text-align:center; }
+    body.dark-mode footer { color:#ccc; }
+
+    @media(max-width:600px){
+      .acciones{flex-direction:column}
+      button{width:100%}
+    }
+
+    /* Login overlay */
+    #loginPanel { position:fixed; top:0; left:0; width:100%; height:100%;
+                  background:rgba(0,0,0,.4); display:none; align-items:center;
+                  justify-content:center; z-index:9999; }
+    #loginBox   { background:#fff; border-radius:1rem; padding:2rem;
+                  max-width:400px; width:90%; box-shadow:0 5px 20px rgba(0,0,0,.2); }
+    body.dark-mode #loginBox { background:#1e1e2e; color:#fff; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🩺 DR.AI <span id="usuarioActivo"
+          style="font-size:.6em;margin-left:10px;color:#888"></span></h1>
+      <div>
+        <button onclick="toggleModo()">🌗</button>
+        <button onclick="toggleLogin()" id="loginBtn" style="color:#111">👤</button>
+      </div>
+    </header>
+
+    <p>Asistente médico basado en IA y evidencia científica.</p>
+
+    <label>Nombre</label>
+    <input id="nombre" type="text">
+
+    <label>Sexo</label>
+    <select id="sexo">
+      <option>Masculino</option>
+      <option>Femenino</option>
+    </select>
+
+    <label>Edad</label>
+    <input id="edad" type="number">
+
+    <label>Síntomas</label>
+    <textarea id="sintomas" rows="4"></textarea>
+
+    <label>Hábitos relevantes (opcional)</label>
+    <textarea id="habitos" rows="2"></textarea>
+
+    <label>Antecedentes personales y familiares (opcional)</label>
+    <textarea id="antecedentes" rows="2"></textarea>
+
+    <button onclick="consultarIA()">Consultar IA</button>
+
+    <div id="reporte"></div>
+
+    <div class="acciones">
+      <button onclick="guardarInforme()">💾 Guardar</button>
+      <button onclick="exportarPDF()">📄 PDF</button>
+      <button onclick="mostrarHistorial()">📚 Historial</button>
+    </div>
+
+    <div id="historial"></div>
+
+    <footer>⚠️ Esta aplicación no reemplaza la consulta médica profesional.</footer>
+  </div>
+
+  <!-- LOGIN MODAL -->
+  <div id="loginPanel">
+    <div id="loginBox">
+      <h3>👤 Iniciar sesión</h3>
+      <label>Alias</label>
+      <input id="userId" type="text">
+      <div style="margin-top:10px">
+        <button onclick="guardarSesion()">💾 Guardar</button>
+        <button onclick="cargarSesion(document.getElementById('userId').value)">📥 Cargar</button>
+        <button onclick="cerrarSesion()">❌ Cerrar</button>
+      </div>
+      <p id="estadoLogin" style="margin-top:.5rem;font-style:italic"></p>
+    </div>
+  </div>
+
+<script>
+/* ---------- PROMPTS ---------- */
+const SYSTEM_PROMPT = `Eres DR.AI, un asistente médico en español que:
+• Genera análisis diferenciales rigurosos basados en evidencia.
+• Nunca diagnostica de forma definitiva ni prescribe medicación; sólo orienta.
+• Utiliza lenguaje claro para público general (<B2).
+• Devuelve SIEMPRE la misma estructura en Markdown con encabezados emoji.
+
+Formato estricto de salida:
+🧠 **Hipótesis diagnósticas preliminares (5)**
+- #1 {enfermedad}
+- #2 {enfermedad}
+- #3 {enfermedad}
+- #4 {enfermedad}
+- #5 {enfermedad}
+
+🔬 **Correlaciones con evidencia científica**
+Explica por qué cada hipótesis se relaciona con los síntomas. Incluye citas abreviadas tipo (Smith 2023).
+
+📋 **Estudios complementarios sugeridos**
+Lista exámenes (max 5) + breve justificación.
+
+💊 **Recomendaciones y orientación terapéutica**
+Consejos de estilo de vida y “consulte a un especialista”.
+
+⚠️ Incluye pie de página: “*Esta información no sustituye la consulta médica profesional.*”`;
+
+/* Construye el prompt USER dinámico */
+function buildUserPrompt() {
+  return `Paciente: ${nombre.value || 'Paciente'}
+Edad: ${edad.value || 'desconocida'} años
+Sexo: ${sexo.value}
+Síntomas reportados: ${sintomas.value.trim()}
+Hábitos relevantes: ${habitos.value.trim() || 'No referidos'}
+Antecedentes personales y familiares: ${antecedentes.value.trim() || 'No referidos'}
+Genera el informe siguiendo exactamente el formato indicado.`;
+}
+
+/* ---------- MODO OSCURO ---------- */
+function toggleModo() {
+  const dark = document.body.classList.toggle('dark-mode');
+  document.documentElement.classList.toggle('dark-mode', dark);
+  loginBtn.style.color = dark ? '#fff' : '#111';
+  localStorage.setItem('modoOscuro', dark);
+}
+window.onload = () => {
+  const dark = localStorage.getItem('modoOscuro') === 'true';
+  document.body.classList.toggle('dark-mode', dark);
+  document.documentElement.classList.toggle('dark-mode', dark);
+  loginBtn.style.color = dark ? '#fff' : '#111';
+};
+
+/* ---------- LLAMADA IA ---------- */
+async function consultarIA() {
+  if (!sintomas.value.trim()) { alert('Ingrese los síntomas'); return; }
+  reporte.innerHTML = '🔄 Generando informe…';
+
+  try {
+    const res = await fetch('/api/completion', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'openai/gpt-3.5-turbo',
+        temperature: 0.3,
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: buildUserPrompt() }
+        ]
+      })
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const md   = data.choices?.[0]?.message?.content || 'Sin respuesta';
+    reporte.innerHTML = marked.parse(md);
+  } catch (e) {
+    reporte.innerHTML = `<p style="color:red;">Error: ${e.message}</p>`;
+  }
+}
+
+/* ---------- HISTORIAL LOCAL ---------- */
+function guardarInforme() {
+  if (!reporte.innerHTML.trim()) { alert('Nada para guardar'); return; }
+  const h = JSON.parse(localStorage.getItem('historial')) || [];
+  h.push({ nombre: nombre.value || 'Anónimo',
+           informe: reporte.innerHTML,
+           fecha: new Date().toISOString() });
+  localStorage.setItem('historial', JSON.stringify(h));
+  alert('Guardado');
+}
+function mostrarHistorial() {
+  const h = JSON.parse(localStorage.getItem('historial')) || [];
+  if (!h.length) { historial.innerHTML = '<p>No hay historial</p>'; return; }
+  historial.innerHTML = h.map((e,i)=>{
+    const f = new Date(e.fecha);
+    return `<div class='historial-item'>
+              <strong>${e.nombre}</strong><br>
+              <small>${f.toLocaleString()}</small><br>
+              <a href='#' onclick='mostrarInforme(${i})'>🔎 Ver</a>
+            </div>`;
+  }).join('');
+}
+function mostrarInforme(i) {
+  const h = JSON.parse(localStorage.getItem('historial')) || [];
+  if (h[i]) reporte.innerHTML = h[i].informe;
+}
+function exportarPDF() {
+  const w = window.open('');
+  w.document.write(`<html><head><title>Informe</title></head><body>${reporte.innerHTML}</body></html>`);
+  w.print();
+}
+
+/* ---------- LOGIN / ALIAS ---------- */
+function toggleLogin() {
+  loginPanel.style.display = loginPanel.style.display === 'flex' ? 'none' : 'flex';
+}
+function guardarSesion() {
+  const id = userId.value.trim();
+  if (!id) { alert('Ingrese alias'); return; }
+  localStorage.setItem(`historial_${id}`, localStorage.getItem('historial') || '[]');
+  estadoLogin.textContent = 'Historial guardado.';
+  usuarioActivo.textContent = `(${id})`;
+}
+function cargarSesion(id) {
+  if (!id) { alert('Ingrese alias'); return; }
+  const datos = localStorage.getItem(`historial_${id}`);
+  if (datos) {
+    localStorage.setItem('historial', datos);
+    mostrarHistorial();
+    estadoLogin.textContent = 'Historial cargado.';
+    usuarioActivo.textContent = `(${id})`;
+  } else {
+    estadoLogin.textContent = 'No se encontró historial para ese alias.';
+  }
+}
+function cerrarSesion() {
+  userId.value = '';
+  estadoLogin.textContent = '';
+  usuarioActivo.textContent = '';
+  loginPanel.style.display = 'none';
+}
+</script>
+</body>
+</html>
