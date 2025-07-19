@@ -1,43 +1,46 @@
+# backend_flask_medical_gpt.py
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-import json
-import os
+import requests, os, json
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='')
 CORS(app)
 
-HISTORIAL_FILE = "historial_medico.json"
-
-def cargar_historial():
-    if not os.path.exists(HISTORIAL_FILE):
-        return []
-    with open(HISTORIAL_FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
-
-def guardar_historial(historial):
-    with open(HISTORIAL_FILE, "w", encoding="utf-8") as f:
-        json.dump(historial, f, indent=2, ensure_ascii=False)
+OPENROUTER_KEY = os.getenv("OPENROUTER_KEY")  # cargada en Render
 
 @app.route("/")
-def home():
-    return "✅ DR.AI Backend funcionando correctamente. Usa /api/historial, /api/guardar o /index.html"
+def root():
+    return send_from_directory('.', 'index.html')
 
-@app.route("/api/historial", methods=["GET"])
-def obtener_historial():
-    return jsonify(cargar_historial())
+# ---------- IA proxy ----------
+@app.route("/api/completion", methods=["POST"])
+def completion():
+    payload = request.get_json()
+    r = requests.post(
+        "https://openrouter.ai/api/v1/chat/completions",
+        headers={
+            "Authorization": f"Bearer {OPENROUTER_KEY}",
+            "Content-Type": "application/json"
+        },
+        json=payload,
+        timeout=60
+    )
+    return (r.content, r.status_code, {"Content-Type": "application/json"})
+
+# ---------- Historial local en disco (opcional) ----------
+HISTORIAL_FILE = "historial_medico.json"
+def load_hist(): return json.load(open(HISTORIAL_FILE)) if os.path.isfile(HISTORIAL_FILE) else []
+def save_hist(h): json.dump(h, open(HISTORIAL_FILE, "w"), ensure_ascii=False, indent=2)
+
+@app.route("/api/historial")
+def historial(): return jsonify(load_hist())
 
 @app.route("/api/guardar", methods=["POST"])
 def guardar():
-    datos = request.json
-    historial = cargar_historial()
-    historial.append(datos)
-    guardar_historial(historial)
-    return jsonify({"status": "ok", "mensaje": "Historial guardado"})
-
-@app.route("/index.html")
-def servir_index():
-    return send_from_directory('.', 'index.html')
+    h = load_hist()
+    h.append(request.json)
+    save_hist(h)
+    return {"status": "ok"}
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8080))
-    app.run(debug=True, host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
